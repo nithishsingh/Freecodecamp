@@ -1,48 +1,39 @@
 name: Auto Pull Request and Merge
+run-name: ${{ github.actor }} is learning GitHub Actions
 
 on:
   push:
     branches:
-      - main  # or your preferred branch name
+      - '*'  # Trigger for all branches
 
 jobs:
   create_pull_request:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get branch name
+        id: branch_name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+      
       - name: Checkout code
         uses: actions/checkout@v2
-
       
-      # You might want to build and test your code before creating a pull request
-      # Add necessary build and test steps here
-
       - name: Create Pull Request
-        uses: nithishsingh/create-pull-request@v3
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
         with:
-          title: 'Auto-generated: Update from main branch'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Automated Pull Request'
+          title: 'Automated Pull Request'
+          branch: ${{ steps.branch_name.outputs.branch }}
           body: |
-            Collection of Project and solution from Freecodecamp for knowledge purpose
-
-            Resources:
-            - Readme
-            - License: GPL-3.0 license
-
-            Languages: Python (100.0%)
-
-          branch: main  # Branch you want to create a pull request against
-          branch-suffix: auto-pr  # Adjust as needed
-
-          # Optionally, add reviewers, assignees, labels, etc., if needed
-
-      # Optionally, you can add steps to merge the pull request automatically
-      # Use caution and consider safety measures in a production environment
-
+            Automated pull request created by a GitHub Action.
+      
       - name: Merge Pull Request
-        uses: nithishsingh/merge-pull-request@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}  # Required for merging
+        if: steps.create_pr.outputs.pull-request-created == 'true'
+        run: |
+          PR_URL=$(echo "${{ steps.create_pr.outputs.pull-request-url }}" | cut -d'/' -f7,8)
+          echo "Pull Request URL: $PR_URL"
+          gh pr merge --auto -d $PR_URL
 
-          # Configure the PR number dynamically if needed
-          pull-request-number: ${{ steps.create_pull_request.outputs.pull-request-number }}
-          merge-method: squash  # Choose merge method as per your needs
+

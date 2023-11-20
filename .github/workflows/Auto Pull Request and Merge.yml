@@ -1,0 +1,48 @@
+name: Auto Pull Request and Merge
+
+on:
+  push:
+    branches:
+      - main  # or your preferred branch name
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      
+      # You might want to build and test your code before creating a pull request
+      # Add necessary build and test steps here
+
+      - name: Create Pull Request
+        uses: nithishsingh/create-pull-request@v3
+        with:
+          title: 'Auto-generated: Update from main branch'
+          body: |
+            Collection of Project and solution from Freecodecamp for knowledge purpose
+
+            Resources:
+            - Readme
+            - License: GPL-3.0 license
+
+            Languages: Python (100.0%)
+
+          branch: main  # Branch you want to create a pull request against
+          branch-suffix: auto-pr  # Adjust as needed
+
+          # Optionally, add reviewers, assignees, labels, etc., if needed
+
+      # Optionally, you can add steps to merge the pull request automatically
+      # Use caution and consider safety measures in a production environment
+
+      - name: Merge Pull Request
+        uses: nithishsingh/merge-pull-request@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Required for merging
+
+          # Configure the PR number dynamically if needed
+          pull-request-number: ${{ steps.create_pull_request.outputs.pull-request-number }}
+          merge-method: squash  # Choose merge method as per your needs

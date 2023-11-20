@@ -35,4 +35,4 @@ jobs:
       - name: Merge Pull Request
         if: steps.create_pr.outputs.pull_request_created == 'true'
         run: |
-          gh pr merge -A $PR_URL
+          gh pr merge -B ${{ steps.branch_name.outputs.branch }} $PR_URL

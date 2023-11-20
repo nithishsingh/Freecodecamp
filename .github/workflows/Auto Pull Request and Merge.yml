@@ -4,7 +4,7 @@ run-name: ${{ github.actor }} is learning GitHub Actions
 on:
   push:
     branches:
-      - '*'  # Trigger for all branches
+      - 'main'  # 
 
 jobs:
   create_pull_request:

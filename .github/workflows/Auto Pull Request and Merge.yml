@@ -29,6 +29,7 @@ jobs:
           commit-message: 'Automated Pull Request'
           title: 'Automated Pull Request'
           branch: ${{ steps.branch_name.outputs.branch }}
+          base: 'main'
           body: |
             Automated pull request created by a GitHub Action.
 
@@ -36,3 +37,5 @@ jobs:
         if: steps.create_pr.outputs.pull_request_created == 'true'
         run: |
           gh pr merge -B ${{ steps.branch_name.outputs.branch }} $PR_URL
+
+

@@ -4,7 +4,7 @@ run-name: ${{ github.actor }} is learning GitHub Actions
 on:
   push:
     branches:
-      - 'main'  # 
+      - '*' # Trigger for all branches
 
 jobs:
   create_pull_request:
@@ -20,10 +20,10 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Create Pull Request
         id: create_pr
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'Automated Pull Request'
@@ -32,15 +32,7 @@ jobs:
           body: |
             Automated pull request created by a GitHub Action.
 
-      - name: Debug Pull Request Creation
-        if: steps.create_pr.outputs.pull-request-created == 'true'
-        run: |
-          echo "Pull Request Created: ${{ steps.create_pr.outputs.pull-request-created }}"
-          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
-      
       - name: Merge Pull Request
-        if: steps.create_pr.outputs.pull-request-created == 'true'
+        if: steps.create_pr.outputs.pull_request_created == 'true'
         run: |
-          PR_URL=$(echo "${{ steps.create_pr.outputs.pull-request-url }}" | cut -d'/' -f7,8)
-          echo "Pull Request URL: $PR_URL"
-          gh pr merge --auto -d $PR_URL
+          gh pr merge -A $PR_URL

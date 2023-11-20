@@ -13,8 +13,11 @@ jobs:
     steps:
       - name: Get branch name
         id: branch_name
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
-      
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "Branch Name: $BRANCH_NAME"
+          echo "::set-output name=branch::$BRANCH_NAME"
+
       - name: Checkout code
         uses: actions/checkout@v2
       
@@ -28,6 +31,12 @@ jobs:
           branch: ${{ steps.branch_name.outputs.branch }}
           body: |
             Automated pull request created by a GitHub Action.
+
+      - name: Debug Pull Request Creation
+        if: steps.create_pr.outputs.pull-request-created == 'true'
+        run: |
+          echo "Pull Request Created: ${{ steps.create_pr.outputs.pull-request-created }}"
+          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
       
       - name: Merge Pull Request
         if: steps.create_pr.outputs.pull-request-created == 'true'
@@ -35,5 +44,3 @@ jobs:
           PR_URL=$(echo "${{ steps.create_pr.outputs.pull-request-url }}" | cut -d'/' -f7,8)
           echo "Pull Request URL: $PR_URL"
           gh pr merge --auto -d $PR_URL
-
-

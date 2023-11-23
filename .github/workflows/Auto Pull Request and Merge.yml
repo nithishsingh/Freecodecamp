@@ -11,15 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get branch name
-        id: branch_name
-        run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          echo "Branch Name: $BRANCH_NAME"
-          echo "::set-output name=branch::$BRANCH_NAME"
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Create Pull Request
         id: create_pr
